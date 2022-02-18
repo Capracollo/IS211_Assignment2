@@ -5,7 +5,7 @@ import datetime
 
 
 def downloadData(url):
-    """Download and decode data from a url"""
+#Downloads and decode data from a url
     try:
         with urllib.request.urlopen(url) as response:
             data = response.read().decode("utf-8")
@@ -16,7 +16,7 @@ def downloadData(url):
 
 
 def processData(file_content):
-    """Parse data from CSV and store it in a dictionary"""
+#Parses data from CSV and store it in a dictionary
     birthdate_dict = {}
     parse_data = file_content.splitlines()
     index = 2
@@ -37,7 +37,7 @@ def processData(file_content):
 
 
 def displayPerson(id, personData):
-    """Print name and birthday identified by input id"""
+#Prints name and birthday identified by input id
     try:
         name, date = personData[id]
         print(f"Person #{id} is {name} with a birthday of {date}")
@@ -67,7 +67,7 @@ def main(url):
             displayPerson(user_input, personData)
 
 if __name__ == "__main__":
-    """Main entry point"""
+#Main entry point
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", help="URL to the datafile", type=str, required=True)
     args = parser.parse_args()
