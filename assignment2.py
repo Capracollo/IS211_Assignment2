@@ -1,73 +1,70 @@
 import argparse
 import urllib.request
 import logging
-from datetime import datetime
+import datetime
 
 
 def downloadData(url):
-    """Downloads the data"""
-
+    """Download and decode data from a url"""
     try:
         with urllib.request.urlopen(url) as response:
-            data = response.read()
+            data = response.read().decode("utf-8")
             return data
-    except Exception as error:
-        print("Uh Oh. Double check the url you entered and try again.")
+    except Exception:
+        print("Check that the url was entered correctly and try again")
         exit()
 
 
 def processData(file_content):
-    """Decodes and breaks CSV data up then stores it in a dictionary """
-
-    person_data = {}
-    split_list = file_content.splitlines()
-    format = "%d/%m/%Y"
-    index = 1
-
-    for i in split_list:
-        a = i.decode("utf-8")  # decodes each entry
-        b = a.split(",")  # splits each entry into it's own list
+    """Parse data from CSV and store it in a dictionary"""
+    birthdate_dict = {}
+    parse_data = file_content.splitlines()
+    index = 2
+    header = True
+    for i in parse_data:
+        if header:
+            header = False
+            continue
+        p = i.split(",")
         try:
-            date_req_format = datetime.strptime(b[2], format).date()  # formats datetime obj
-            person_data[b[0]] = (b[1], date_req_format)  # adds entries to dictionary
+            formatted_date = datetime.datetime.strptime(p[2], "%d/%m/%Y").date()
+            birthdate_dict[int(p[0])] = (p[1], formatted_date)
         except ValueError:
-            logging.error("Error processing line #{} for ID #{}".format(index, b[0]))
-
+            logging.error(f"Error processing line #{index} for ID #{p[0]}")
         index += 1
 
-    return person_data  # returns dictionary
+    return birthdate_dict
 
 
 def displayPerson(id, personData):
-    """Gets name and bday of a user"""
-
+    """Print name and birthday identified by input id"""
     try:
-        name, date = personData[str(id)]
-        print("Person #{} is {} with a birthday of {}".format(id, name, date))
+        name, date = personData[id]
+        print(f"Person #{id} is {name} with a birthday of {date}")
     except:
-        print("No user found with that ID")
+        print("No user found with that id")
 
 
 def main(url):
     print(f"Running main with URL = {url}...")
-
-    LOG_FORMAT = "%(asctime)s %(levelname)s %(message)s"
     logging.getLogger("assignment2")
-    logging.basicConfig(filename="error.log", level=logging.ERROR, format=LOG_FORMAT, filemode="w")
+    logging.basicConfig(
+        filename="error.log",
+        level=logging.ERROR,
+        format="%(levelname)-8s %(message)s",
+        filemode="w"
+    )
 
     csvData = downloadData(url)
     personData = processData(csvData)
 
-    # prompts user for ID input until they give a value of <= 0
-    val = True
-
-    while val > 0:
-        val = int(input("Enter a user ID: "))
-        if val < 1:
+    user_input = True
+    while user_input > 0:
+        user_input = int(input("Enter ID: "))
+        if user_input <= 0:
             exit()
         else:
-            displayPerson(val, personData)
-
+            displayPerson(user_input, personData)
 
 if __name__ == "__main__":
     """Main entry point"""
