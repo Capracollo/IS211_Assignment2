@@ -21,16 +21,16 @@ def processData(file_content):
     parse_data = file_content.splitlines()
     index = 2
     header = True
-    for i in parse_data:
+    for datedata in parse_data:
         if header:
             header = False
             continue
-        p = i.split(",")
+        datesection = datedata.split(",")
         try:
-            formatted_date = datetime.datetime.strptime(p[2], "%d/%m/%Y").date()
-            birthdate_dict[int(p[0])] = (p[1], formatted_date)
+            formatted_date = datetime.datetime.strptime(datesection[2], "%d/%m/%Y").date()
+            birthdate_dict[int(datesection[0])] = (datesection[1], formatted_date)
         except ValueError:
-            logging.error(f"Error processing line #{index} for ID #{p[0]}")
+            logging.error(f"Error processing line #{index} for ID #{datesection[0]}")
         index += 1
 
     return birthdate_dict
