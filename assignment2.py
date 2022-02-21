@@ -35,7 +35,7 @@ def processData(file_content):
 
     return birthdate_dict
 
-
+  
 def displayPerson(id, personData):
 #Prints name and birthday identified by input id
     try:
